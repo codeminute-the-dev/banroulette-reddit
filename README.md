@@ -59,3 +59,4 @@ Bot checks for this file on every iteration and exits cleanly. Delete it before 
 - Mods are never banned regardless of what they post
 - Bot won't double-process a post if it restarts mid-run — it checks for its own existing reply first
 - All settings in `config.py` are the defaults; `runtime_config.json` (written by the admin panel) overrides them at startup
+- I will never release a release on this repo, it's just fucking python. Clone it and run it (if u aren't retarded, if you are you are going to compile it)
