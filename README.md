@@ -1,78 +1,61 @@
-# ban-roulette
+# ban-roulette-bot
 
-bans redditors when they ask for it. that's it.
+Users opt in by putting "play ban roulette" anywhere in their post title. Bot detects it, picks a random ban duration, bans them, and replies with the result.
 
-wrote this because people like gambling. (jk, some discord user asked me for it and i agreed cause funny)
+## Setup
 
-![platform](https://img.shields.io/badge/platform-reddit-ff4500)
-![language](https://img.shields.io/badge/language-python-3776ab)
-![license](https://img.shields.io/badge/license-MIT-green)
+**1. Create a Reddit script app**
 
----
+Log into the bot account → https://www.reddit.com/prefs/apps → create app → type: script. Grab the client ID and secret.
 
-## what it does
+**2. Add the bot as a mod**
 
-- detects when someone puts a trigger phrase (like "play ban roulette") in a post title
-- rolls a weighted virtual wheel for a ban duration
-- bans them, replies to the post, sends a dm. pretty straightforward
-- has a web admin panel if you don't like editing json files
-- ignores mods (obviously)
----
+Subreddit mod tools → Moderators → invite the bot account with `Ban users` permission only.
 
-## setup
+**3. Install**
 
-needs a reddit script app. go to your bot account's prefs/apps, make one, grab the client id and secret. invite the bot to your sub with `Ban users` permission only.
-
-```bat
+```
 pip install -r requirements.txt
 cp .env.example .env
+# fill in .env
 ```
 
-fill out the `.env`. no docker container. no poetry. no 47-step setup.
+**4. Run**
 
----
-
-## usage
-
-run the admin panel:
-
-```bat
+Start the admin panel:
+```
 python admin.py
 ```
+Open http://localhost:5000, configure everything, then hit START. That's it.
 
-go to `http://localhost:5000`. log in (default password is in the code, you will want to change it in `.env`), set your subreddit and trigger phrases, and hit start.
-
-if you hate web uis, just run the bot directly:
-
-```bat
+Or run the bot directly without the admin panel:
+```
 python bot.py
 ```
 
----
+## Admin panel
 
-## output
+- **START / STOP / RESTART** — process control
+- **KILLSWITCH** — same as creating a KILLSWITCH file manually, stops the bot cleanly
+- **CONFIG tab** — edit subreddit, trigger phrases, ban pool, message templates (saved to `runtime_config.json`, takes effect on restart)
+- **LOGS tab** — live tail of `banroulette.log`
 
-if you're tailing `banroulette.log` or looking at the web panel logs:
+Password is set via `ADMIN_PASSWORD` in `.env`.
 
+## Manual killswitch
+
+If you're not using the admin panel, create a file named `KILLSWITCH` in the bot directory:
+
+```bash
+touch KILLSWITCH          # linux/mac
+echo. > KILLSWITCH        # windows cmd
 ```
-  2026-05-30 12:34:56  INFO      hit: x1y2z3 by u/someguy
-  2026-05-30 12:34:56  INFO        result: 30 days
-  2026-05-30 12:34:57  INFO        banned u/someguy: 30 days
-  2026-05-30 12:40:12  INFO      hit: a9b8c7 by u/alreadybannedguy
-```
 
-good for when you're staring at it at 2am watching people voluntarily ruin their own subreddit access.
+Bot checks for this file on every iteration and exits cleanly. Delete it before restarting.
 
----
+## Notes
 
-## caveats
-
-- reddit api minimum temp ban is 1 day. you can't ban someone for 5 minutes
-- if you run it headless and want to stop it cleanly, make a file called `KILLSWITCH` in the bot directory. delete it before restarting
-- it won't double-process a post if it crashes mid-run, it checks for its own existing reply first
-
----
-
-## license
-
-idc, do whatever you want with it
+- Reddit API minimum temp ban duration is 1 day, so sub-day bans aren't possible
+- Mods are never banned regardless of what they post
+- Bot won't double-process a post if it restarts mid-run — it checks for its own existing reply first
+- All settings in `config.py` are the defaults; `runtime_config.json` (written by the admin panel) overrides them at startup
